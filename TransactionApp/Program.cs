@@ -69,7 +69,7 @@ namespace TransactionApp
             var conn = new SqlConnection(conString);
             conn.Open();
             var command = conn.CreateCommand();
-            command.CommandText = "select sum( case when t.Amount * -1 else t.Amount end) from Transactions t left join Account a on t.Account_Id = a.Id where a.Is_Active = @fromAcc";
+            command.CommandText = "select sum( case t.Amount * -1 else t.Amount end) from Transactions t left join Account a on t.Account_Id = a.Id where a.Is_Active = @fromAcc";
             command.Parameters.AddWithValue("@fromAcc", account);
             var reader = command.ExecuteReader();
             var fromAccBalance = 0m;
@@ -112,9 +112,9 @@ namespace TransactionApp
             {
                 var fromAccBalance = GetAccountBalance(conString, fromAcc);
 
-                if (fromAccBalance <= 0 || (fromAccBalance - amount) < 0)
+               if (fromAccBalance <= 0 || (fromAccBalance - amount) < 0)
                 {
-                    throw new Exception("From account balance not enough amount");
+                   throw new Exception("From account balance not enough amount");
                 }
 
                 var fromAccId = GetAccountId(fromAcc, conString);
@@ -170,10 +170,10 @@ namespace TransactionApp
         {
             var accNumber = 0;
             var connection = new SqlConnection(conString);
-            var query = "SELECT [Id] FROM [dbo].[Account] WHERE [Is_Active] = @number";
+            var query = "SELECT [Id] FROM [dbo].[Account] WHERE [Is_Active] = @is_active";
 
             var command = connection.CreateCommand();
-            command.Parameters.AddWithValue("@number", number);
+            command.Parameters.AddWithValue("@is_active", number);
             command.CommandText = query;
 
             connection.Open();
@@ -192,7 +192,7 @@ namespace TransactionApp
 
         private static void CreateAccount(string conString)
         {
-            var client = new Client { Account = "test1", Is_Active = 1, Created_At = DateTime.Now, Updated_At = DateTime.Now };
+            var client = new Client { Account = "test5", Is_Active = 1, Created_At = DateTime.Now, Updated_At = DateTime.Now };
 
             var connection = new SqlConnection(conString);
             var query = "INSERT INTO [dbo].[Account]([Account] ,[Is_Active] ,[Created_At], [Updated_At]) VALUES (@account ,@is_active ,@created_at ,@updated_at)";
@@ -237,7 +237,7 @@ namespace TransactionApp
                 var client = new Client { };
 
                 client.Id = int.Parse(reader["Id"].ToString());
-                client.Account = reader["Acount"].ToString();
+                client.Account = reader["Account"].ToString();
                 var y = reader["Is_Active"]?.ToString();
                 var x = reader["Created_At"]?.ToString();
                 client.Created_At = !string.IsNullOrEmpty(reader["Created_At"]?.ToString()) ? DateTime.Parse(reader["Created_At"].ToString()) : null;
@@ -287,7 +287,7 @@ namespace TransactionApp
     {
         public int Id { get; set; }
         public decimal Amount { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime Created_At { get; set; }
         public int Account_Id { get; set; }
     }
 }
